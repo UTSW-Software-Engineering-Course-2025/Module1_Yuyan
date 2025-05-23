@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html lang="english" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tsne &#8212; tsne 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=14667faf"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for tsne</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Usage:</span>
+<span class="sd">  tsne.py [--input=&lt;input_file&gt;] [--dims=&lt;int&gt;] [--tol=&lt;float&gt;] [--perp=&lt;float&gt;] [--ini-momentum=&lt;float&gt;] [--final-momentum=&lt;float&gt;]</span>
+<span class="sd">          [--stepsize=&lt;float&gt;] [--min-gain=&lt;float&gt;] [--iters=&lt;int&gt;] [--output=&lt;output_file&gt;] [--plot] [--save-fig]</span>
+
+<span class="sd">Options:</span>
+<span class="sd">  --input=&lt;input_file&gt;       Input txt file [default: mnist2500_X.txt].</span>
+<span class="sd">  --dims=&lt;int&gt;               Output dimensions [default: 2].</span>
+<span class="sd">  --tol=&lt;float&gt;              Tolerance for beta search [default: 1e-5].</span>
+<span class="sd">  --perp=&lt;float&gt;             Perplexity [default: 30.0].</span>
+<span class="sd">  --ini-momentum=&lt;float&gt;    Initial momentum [default: 0.5].</span>
+<span class="sd">  --final-momentum=&lt;float&gt;   Final momentum [default: 0.8].</span>
+<span class="sd">  --stepsize=&lt;float&gt;         Learning rate [default: 500].</span>
+<span class="sd">  --min-gain=&lt;float&gt;         Minimum gain value [default: 0.01].</span>
+<span class="sd">  --iters=&lt;int&gt;              Number of iterations [default: 1000].</span>
+<span class="sd">  --output=&lt;output_file&gt;     Output file path [default: tsne_result.npy].</span>
+<span class="sd">  --plot                     Whether to show plot.</span>
+<span class="sd">  --save-fig                 Whether to save the plot.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">adjustbeta</span> <span class="kn">import</span> <span class="n">adjustbeta</span>
+<span class="kn">from</span> <span class="nn">docopt</span> <span class="kn">import</span> <span class="n">docopt</span>
+<span class="kn">import</span> <span class="nn">dash</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="viewcode-block" id="pca">
+<a class="viewcode-back" href="../usage.html#tsne.pca">[docs]</a>
+<span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">no_dims</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs PCA on the nxd array X in order to reduce its dimensionality to</span>
+<span class="sd">    no_dims dimensions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : numpy.ndarray</span>
+<span class="sd">        data input array with dimension (n,d)</span>
+<span class="sd">    no_dims : int</span>
+<span class="sd">        number of dimensions that PCA reduce to</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Y : numpy.ndarray</span>
+<span class="sd">        low-dimensional representation of input X</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">[:,</span> <span class="p">:</span><span class="n">no_dims</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">Y</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="dis_matrix">
+<a class="viewcode-back" href="../usage.html#tsne.dis_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">dis_matrix</span> <span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute pairwise squared Euclidean distance matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : ndarray of shape (n_samples, n_features)</span>
+<span class="sd">        Input data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    D : ndarray of shape (n_samples, n_samples)</span>
+<span class="sd">        Distance matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Xi_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  
+    <span class="n">D</span> <span class="o">=</span> <span class="n">Xi_2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">Xi_2</span><span class="o">.</span><span class="n">T</span> 
+    <span class="k">return</span> <span class="n">D</span></div>
+
+
+<div class="viewcode-block" id="compute_p_ij">
+<a class="viewcode-back" href="../usage.html#tsne.compute_p_ij">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_p_ij</span><span class="p">(</span><span class="n">P</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Symmetrize conditional probability matrix P.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    P : ndarray</span>
+<span class="sd">        Conditional probabilities.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    p_ij : ndarray</span>
+<span class="sd">        Symmetric joint probabilities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">P</span> <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">P</span><span class="o">+</span><span class="n">P</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">p_ij</span> <span class="o">=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="k">return</span> <span class="n">p_ij</span></div>
+
+
+<div class="viewcode-block" id="compute_q_ij">
+<a class="viewcode-back" href="../usage.html#tsne.compute_q_ij">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_q_ij</span><span class="p">(</span><span class="n">Y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute low-dimensional joint probabilities q_ij from Y.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Y : ndarray of shape (n_samples, n_components)</span>
+<span class="sd">        Low-dimensional embeddings.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    q_ij : ndarray</span>
+<span class="sd">        Joint probabilities in low-dimensional space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">distance_y</span> <span class="o">=</span>  <span class="n">dis_matrix</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">distance_y</span><span class="p">))</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+    <span class="n">q_ij</span> <span class="o">=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span> 
+    <span class="k">return</span> <span class="n">q_ij</span></div>
+
+
+<div class="viewcode-block" id="compute_dY">
+<a class="viewcode-back" href="../usage.html#tsne.compute_dY">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_dY</span><span class="p">(</span><span class="n">p_ij</span><span class="p">,</span> <span class="n">q_ij</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute gradient of the KL divergence with respect to Y.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p_ij : ndarray</span>
+<span class="sd">        High-dimensional joint probabilities.</span>
+<span class="sd">    q_ij : ndarray</span>
+<span class="sd">        Low-dimensional joint probabilities.</span>
+<span class="sd">    Y : ndarray</span>
+<span class="sd">        Current low-dimensional embeddings.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dY : ndarray</span>
+<span class="sd">        Gradient with respect to Y.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_ij</span> <span class="o">-</span> <span class="n">q_ij</span> <span class="p">)</span>
+    <span class="n">inverse</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">dis_matrix</span><span class="p">(</span><span class="n">Y</span><span class="p">)))</span>
+    <span class="n">diff_y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">dY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(((</span><span class="n">diff</span><span class="o">*</span><span class="n">inverse</span><span class="p">)[:,:,</span><span class="kc">None</span><span class="p">])</span><span class="o">*</span><span class="n">diff_y</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">diff</span><span class="p">,</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">diff_y</span>
+    <span class="k">return</span> <span class="n">dY</span></div>
+
+
+
+<div class="viewcode-block" id="tsne">
+<a class="viewcode-back" href="../usage.html#tsne.tsne">[docs]</a>
+<span class="k">def</span> <span class="nf">tsne</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">no_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">perplexity</span> <span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">ini_momentum</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">final_momentum</span><span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">stepsize</span> <span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_gain</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">save_fig</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform t-SNE on high-dimensional data X.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : ndarray</span>
+<span class="sd">        High-dimensional input data.</span>
+<span class="sd">    no_dims : int</span>
+<span class="sd">        Output dimensionality (usually 2 or 3).</span>
+<span class="sd">    tol : float</span>
+<span class="sd">        Tolerance for binary search in P computation.</span>
+<span class="sd">    perplexity : float</span>
+<span class="sd">        Perplexity used to determine bandwidths.</span>
+<span class="sd">    ini_momentum : float</span>
+<span class="sd">        Initial momentum value.</span>
+<span class="sd">    final_momentum : float</span>
+<span class="sd">        Final momentum after early iterations.</span>
+<span class="sd">    stepsize : float</span>
+<span class="sd">        Learning rate.</span>
+<span class="sd">    min_gain : float</span>
+<span class="sd">        Minimum gain value.</span>
+<span class="sd">    T : int</span>
+<span class="sd">        Number of iterations.</span>
+<span class="sd">    plot : bool</span>
+<span class="sd">        Whether to plot the result.</span>
+<span class="sd">    save_fig : bool</span>
+<span class="sd">        Whether to save the plot.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Y : ndarray of shape (n_samples, no_dims)</span>
+<span class="sd">        Low-dimensional embedding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># calculate P_j|i by X </span>
+    <span class="n">P</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">adjustbeta</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">perplexity</span><span class="p">)</span>
+
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">pca</span><span class="p">(</span> <span class="n">X</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[:,:</span><span class="n">no_dims</span><span class="p">]</span>
+    <span class="c1"># initialize delta_Y and gains </span>
+    <span class="n">delta_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">no_dims</span><span class="p">))</span>
+    <span class="n">gains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">no_dims</span><span class="p">))</span>
+    <span class="n">p_ij</span> <span class="o">=</span> <span class="n">compute_p_ij</span><span class="p">(</span><span class="n">P</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span>
+    
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span> <span class="p">(</span><span class="n">T</span><span class="p">)):</span>
+        <span class="c1"># compute q_ij from Y </span>
+        <span class="n">q_ij</span> <span class="o">=</span> <span class="n">compute_q_ij</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> 
+        <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">q_ij</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># compute gradient of Y </span>
+        <span class="n">dY</span> <span class="o">=</span> <span class="n">compute_dY</span><span class="p">(</span><span class="n">p_ij</span><span class="p">,</span> <span class="n">q_ij</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+        <span class="c1"># choose momentum to be initial momentum if t&lt;20, otherwise momentum is final_momentum </span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">20</span> <span class="p">:</span>
+            <span class="n">momentum</span> <span class="o">=</span> <span class="n">ini_momentum</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">momentum</span> <span class="o">=</span> <span class="n">final_momentum</span>
+        
+        <span class="c1"># compute and update gains</span>
+        <span class="n">gains</span> <span class="o">=</span> <span class="p">(</span><span class="n">gains</span> <span class="o">+</span> <span class="mf">0.2</span><span class="p">)</span><span class="o">*</span> <span class="p">((</span><span class="n">dY</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">!=</span> <span class="p">(</span><span class="n">delta_Y</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">))</span><span class="o">+</span> <span class="p">(</span><span class="n">gains</span><span class="o">*</span><span class="mf">0.8</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="n">dY</span><span class="o">&gt;</span><span class="mi">0</span> <span class="p">)</span><span class="o">==</span><span class="p">(</span><span class="n">delta_Y</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">))</span>
+        
+        <span class="c1">#clip it to be at least min_gain</span>
+        <span class="n">gains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">min_gain</span><span class="p">,</span> <span class="n">gains</span><span class="p">)</span>
+
+        <span class="c1"># update delta_Y and Y </span>
+        <span class="n">delta_Y</span> <span class="o">=</span> <span class="n">momentum</span><span class="o">*</span><span class="n">delta_Y</span> <span class="o">-</span> <span class="n">stepsize</span><span class="o">*</span><span class="p">(</span> <span class="n">gains</span> <span class="o">*</span> <span class="n">dY</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">+</span> <span class="n">delta_Y</span>
+
+        <span class="c1"># remove exaggeration </span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">100</span> <span class="p">:</span>
+            <span class="n">p_ij</span> <span class="o">=</span> <span class="n">p_ij</span><span class="o">/</span><span class="mi">4</span>
+        
+    <span class="k">return</span> <span class="n">Y</span> </div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">docopt</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="c1"># Load data from file</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--input&quot;</span><span class="p">])</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">pca</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;mnist2500_labels.txt&quot;</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">tsne</span><span class="p">(</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">no_dims</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--dims&quot;</span><span class="p">]),</span>
+        <span class="n">tol</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--tol&quot;</span><span class="p">]),</span>
+        <span class="n">perplexity</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--perp&quot;</span><span class="p">]),</span>
+        <span class="n">ini_momentum</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--ini-momentum&quot;</span><span class="p">]),</span>
+        <span class="n">final_momentum</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--final-momentum&quot;</span><span class="p">]),</span>
+        <span class="n">stepsize</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--stepsize&quot;</span><span class="p">]),</span>
+        <span class="n">min_gain</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--min-gain&quot;</span><span class="p">]),</span>
+        <span class="n">T</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--iters&quot;</span><span class="p">]),</span>
+        <span class="n">plot</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--plot&quot;</span><span class="p">],</span>
+        <span class="n">save_fig</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--save-fig&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># draw 2d scatter plot</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--dims&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">20</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;mnist_tsne.png&quot;</span><span class="p">)</span>
+    <span class="c1"># draw 3d scatter plot </span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;--dims&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3D t-SNE selected&quot;</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> 
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">Y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">Y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">Y</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">labels</span>
+        <span class="p">})</span>
+        <span class="c1"># Create plot</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_3d</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">color_discrete_sequence</span><span class="o">=</span><span class="n">px</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">qualitative</span><span class="o">.</span><span class="n">G10</span><span class="p">)</span>
+        <span class="c1"># Create Dash app</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">dash</span><span class="o">.</span><span class="n">Dash</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">H3</span><span class="p">(</span><span class="s2">&quot;Simple 3D t-SNE Visualization&quot;</span><span class="p">),</span>
+            <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">figure</span><span class="o">=</span><span class="n">fig</span><span class="p">)</span>
+        <span class="p">])</span>
+
+
+        <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+    
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tsne</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">t-SNE Module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, yuyan liu.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
