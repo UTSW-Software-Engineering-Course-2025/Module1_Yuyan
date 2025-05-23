@@ -9,3 +9,14 @@ Contents:
    :members:
    :undoc-members:
    :show-inheritance:
+
+adjustbeta Module
+============
+
+
+Contents:
+
+.. automodule:: adjustbeta
+   :members:
+   :undoc-members:
+   :show-inheritance:

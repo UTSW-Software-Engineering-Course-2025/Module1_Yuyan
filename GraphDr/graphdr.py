@@ -143,6 +143,7 @@ def graphdr(pca_data, anno, lambda_=20.0, no_rotation=True, num_neighbors=10, pl
         Z = inverse_L @ pca_data @ eigvec
     else:
         Z = inverse_L @ pca_data
+        
     # Optional: generate plot
     if plot_graphdr:
         plt.figure(figsize=(15, 10))
