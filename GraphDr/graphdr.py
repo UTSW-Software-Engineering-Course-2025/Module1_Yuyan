@@ -140,10 +140,9 @@ def graphdr(pca_data, anno, lambda_=20.0, no_rotation=True, num_neighbors=10, pl
     if not no_rotation:
         mul = pca_data.T @ inverse_L @ pca_data
         _, eigvec = np.linalg.eigh(mul)
-        Z = inverse_L @ pca_data @ eigvec[:, -2:]  # take top 2 components for visualization
+        Z = inverse_L @ pca_data @ eigvec
     else:
-        Z = inverse_L @ pca_data[:, :2]  # take first 2 dimensions for plotting
-
+        Z = inverse_L @ pca_data
     # Optional: generate plot
     if plot_graphdr:
         plt.figure(figsize=(15, 10))

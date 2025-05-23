@@ -111,6 +111,26 @@ def compute_q_ij(Y):
     q_ij = num / den 
     return q_ij
 
+def compute_kl(p_ij, q_ij):
+    """
+    Compute the Kullback-Leibler (KL) divergence between two probability matrices.
+
+    Parameters
+    ----------
+    P : ndarray of shape (n_samples, n_samples)
+        High-dimensional joint probability matrix.
+    Q : ndarray of shape (n_samples, n_samples)
+        Low-dimensional joint probability matrix.
+
+    Returns
+    -------
+    C : float
+        The KL divergence value KL(P || Q).
+    """
+    p_ij = np.maximum(p_ij, 1e-12)  # avoid log(0)
+    q_ij = np.maximum(q_ij, 1e-12)
+    return np.sum(p_ij * np.log(p_ij / q_ij))
+
 def compute_dY(p_ij, q_ij, Y):
     """
     Compute gradient of the KL divergence with respect to Y.
@@ -138,40 +158,57 @@ def compute_dY(p_ij, q_ij, Y):
 
 
 def tsne(X,no_dims=2, tol = 1e-5, perplexity =30.0, ini_momentum=0.5, final_momentum= 0.8, stepsize =500, min_gain = 0.01, T = 1000, plot= True, save_fig = False):
-    n= X.shape [0]
     """
     Perform t-SNE on high-dimensional data X.
 
     Parameters
     ----------
-    X : ndarray
+    X : ndarray of shape (n_samples, n_features)
         High-dimensional input data.
     no_dims : int
         Output dimensionality (usually 2 or 3).
     tol : float
         Tolerance for binary search in P computation.
     perplexity : float
-        Perplexity used to determine bandwidths.
+        Perplexity used to balance local/global aspects of the embedding.
     ini_momentum : float
-        Initial momentum value.
+        Initial momentum value used in early optimization.
     final_momentum : float
-        Final momentum after early iterations.
+        Final momentum value used after `early exaggeration` phase.
     stepsize : float
-        Learning rate.
+        Learning rate (step size for gradient descent).
     min_gain : float
-        Minimum gain value.
+        Minimum gain applied during gradient update scaling.
     T : int
-        Number of iterations.
+        Number of optimization iterations.
     plot : bool
-        Whether to plot the result.
+        Whether to display the resulting embedding as a 2D or 3D plot.
     save_fig : bool
-        Whether to save the plot.
+        Whether to save the plot as a static image or HTML.
 
     Returns
     -------
     Y : ndarray of shape (n_samples, no_dims)
-        Low-dimensional embedding.
+        Low-dimensional embedding of the data.
+
+    Raises
+    ------
+    ValueError
+        If `X` is not a 2D array.
+        If `perplexity` is greater than the number of samples.
+        If `no_dims` is not 2 or 3 when `plot=True`.
+        If `stepsize`, `perplexity`, or `T` are non-positive.
+
+    Examples
+    --------
+    >>> from tsne import tsne
+    >>> X = np.random.rand(100, 50)
+    >>> Y = tsne(X, no_dims=2, perplexity=30.0, T=1000, plot=True, save_fig=False)
+    >>> Y.shape
+    (100, 2)
     """
+    n= X.shape [0]
+
     # calculate P_j|i by X 
     P, beta = adjustbeta(X, tol, perplexity)
 
@@ -251,7 +288,6 @@ if __name__ == "__main__":
             html.H3("Simple 3D t-SNE Visualization"),
             dcc.Graph(figure=fig)
         ])
-
 
         app.run(debug=True)
 
