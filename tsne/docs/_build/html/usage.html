@@ -1,90 +1,119 @@
+
+
 <!DOCTYPE html>
+<html class="writer-html5" lang="english" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="english" data-content_root="./">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>t-SNE Module &mdash; tsne 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
-    <title>t-SNE Module &#8212; tsne 1.0.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=14667faf"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=14667faf"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="tsne documentation" href="index.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
+    <link rel="prev" title="tsne documentation" href="index.html" /> 
+</head>
 
-  
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
           
+          
+          <a href="index.html" class="icon icon-home">
+            tsne
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">t-SNE Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tsne.compute_dY"><code class="docutils literal notranslate"><span class="pre">compute_dY()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsne.compute_kl"><code class="docutils literal notranslate"><span class="pre">compute_kl()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsne.compute_p_ij"><code class="docutils literal notranslate"><span class="pre">compute_p_ij()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsne.compute_q_ij"><code class="docutils literal notranslate"><span class="pre">compute_q_ij()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsne.dis_matrix"><code class="docutils literal notranslate"><span class="pre">dis_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsne.pca"><code class="docutils literal notranslate"><span class="pre">pca()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsne.tsne"><code class="docutils literal notranslate"><span class="pre">tsne()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#adjustbeta-module">adjustbeta Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#adjustbeta.Hbeta"><code class="docutils literal notranslate"><span class="pre">Hbeta()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adjustbeta.adjustbeta"><code class="docutils literal notranslate"><span class="pre">adjustbeta()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adjustbeta.dis_matrix"><code class="docutils literal notranslate"><span class="pre">dis_matrix()</span></code></a></li>
+</ul>
+</li>
+</ul>
 
-          <div class="body" role="main">
-            
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tsne</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">t-SNE Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="t-sne-module">
-<h1>t-SNE Module<a class="headerlink" href="#t-sne-module" title="Link to this heading">¶</a></h1>
+<h1>t-SNE Module<a class="headerlink" href="#t-sne-module" title="Link to this heading"></a></h1>
 <p>This module contains functions for running t-SNE, PCA, and visualizing embeddings.</p>
 <p>Contents:</p>
-<dl id="module-tsne">
+<dl class="simple" id="module-tsne">
 <dt>Usage:</dt><dd><dl class="simple">
 <dt>tsne.py [--input=&lt;input_file&gt;] [--dims=&lt;int&gt;] [--tol=&lt;float&gt;] [--perp=&lt;float&gt;] [--ini-momentum=&lt;float&gt;] [--final-momentum=&lt;float&gt;]</dt><dd><p>[--stepsize=&lt;float&gt;] [--min-gain=&lt;float&gt;] [--iters=&lt;int&gt;] [--output=&lt;output_file&gt;] [--plot] [--save-fig]</p>
 </dd>
 </dl>
 </dd>
-<dt>Options:</dt><dd><dl class="option-list">
-<dt><kbd><span class="option">--input=<var>&lt;input_file&gt;</var></span></kbd></dt>
-<dd><p>Input txt file [default: mnist2500_X.txt].</p>
-</dd>
-<dt><kbd><span class="option">--dims=<var>&lt;int&gt;</var></span></kbd></dt>
-<dd><p>Output dimensions [default: 2].</p>
-</dd>
-<dt><kbd><span class="option">--tol=<var>&lt;float&gt;</var></span></kbd></dt>
-<dd><p>Tolerance for beta search [default: 1e-5].</p>
-</dd>
-<dt><kbd><span class="option">--perp=<var>&lt;float&gt;</var></span></kbd></dt>
-<dd><p>Perplexity [default: 30.0].</p>
-</dd>
-<dt><kbd><span class="option">--ini-momentum=<var>&lt;float&gt;</var></span></kbd></dt>
-<dd><p>Initial momentum [default: 0.5].</p>
-</dd>
-<dt><kbd><span class="option">--final-momentum=<var>&lt;float&gt;</var></span></kbd></dt>
-<dd><p>Final momentum [default: 0.8].</p>
-</dd>
-<dt><kbd><span class="option">--stepsize=<var>&lt;float&gt;</var></span></kbd></dt>
-<dd><p>Learning rate [default: 500].</p>
-</dd>
-<dt><kbd><span class="option">--min-gain=<var>&lt;float&gt;</var></span></kbd></dt>
-<dd><p>Minimum gain value [default: 0.01].</p>
-</dd>
-<dt><kbd><span class="option">--iters=<var>&lt;int&gt;</var></span></kbd></dt>
-<dd><p>Number of iterations [default: 1000].</p>
-</dd>
-<dt><kbd><span class="option">--output=<var>&lt;output_file&gt;</var></span></kbd></dt>
-<dd><p>Output file path [default: tsne_result.npy].</p>
-</dd>
-<dt><kbd><span class="option">--plot</span></kbd></dt>
-<dd><p>Whether to show plot.</p>
-</dd>
-<dt><kbd><span class="option">--save-fig</span></kbd></dt>
-<dd><p>Whether to save the plot.</p>
-</dd>
-</dl>
+<dt>Options:</dt><dd><p>-h --help             Show this screen.
+--input=&lt;input_file&gt;       Input txt file [default: mnist2500_X.txt].
+--dims=&lt;int&gt;               Output dimensions [default: 2].
+--tol=&lt;float&gt;              Tolerance for beta search [default: 1e-5].
+--perp=&lt;float&gt;             Perplexity [default: 30.0].
+--ini-momentum=&lt;float&gt;    Initial momentum [default: 0.5].
+--final-momentum=&lt;float&gt;   Final momentum [default: 0.8].
+--stepsize=&lt;float&gt;         Learning rate [default: 500].
+--min-gain=&lt;float&gt;         Minimum gain value [default: 0.01].
+--iters=&lt;int&gt;              Number of iterations [default: 1000].
+--output=&lt;output_file&gt;     Output file path [default: tsne_result.npy].
+--plot                     Whether to show plot.
+--save-fig                 Whether to save the plot.</p>
 </dd>
 </dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="tsne.compute_dY">
-<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">compute_dY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_ij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_ij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#compute_dY"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.compute_dY" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">compute_dY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_ij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_ij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#compute_dY"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.compute_dY" title="Link to this definition"></a></dt>
 <dd><p>Compute gradient of the KL divergence with respect to Y.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -104,8 +133,28 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tsne.compute_kl">
+<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">compute_kl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_ij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_ij</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#compute_kl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.compute_kl" title="Link to this definition"></a></dt>
+<dd><p>Compute the Kullback-Leibler (KL) divergence between two probability matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>ndarray</em><em> of </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_samples</em><em>)</em>) -- High-dimensional joint probability matrix.</p></li>
+<li><p><strong>Q</strong> (<em>ndarray</em><em> of </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_samples</em><em>)</em>) -- Low-dimensional joint probability matrix.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>C</strong> -- The KL divergence value KL(P || Q).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tsne.compute_p_ij">
-<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">compute_p_ij</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#compute_p_ij"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.compute_p_ij" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">compute_p_ij</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#compute_p_ij"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.compute_p_ij" title="Link to this definition"></a></dt>
 <dd><p>Symmetrize conditional probability matrix P.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -122,7 +171,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tsne.compute_q_ij">
-<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">compute_q_ij</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#compute_q_ij"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.compute_q_ij" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">compute_q_ij</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#compute_q_ij"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.compute_q_ij" title="Link to this definition"></a></dt>
 <dd><p>Compute low-dimensional joint probabilities q_ij from Y.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -139,7 +188,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tsne.dis_matrix">
-<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">dis_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#dis_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.dis_matrix" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">dis_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#dis_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.dis_matrix" title="Link to this definition"></a></dt>
 <dd><p>Compute pairwise squared Euclidean distance matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -156,7 +205,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tsne.pca">
-<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.pca" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.pca" title="Link to this definition"></a></dt>
 <dd><p>Runs PCA on the nxd array X in order to reduce its dimensionality to
 no_dims dimensions.</p>
 <dl class="field-list simple">
@@ -177,84 +226,145 @@ no_dims dimensions.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tsne.tsne">
-<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">tsne</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perplexity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ini_momentum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_momentum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#tsne"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.tsne" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">tsne.</span></span><span class="sig-name descname"><span class="pre">tsne</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perplexity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ini_momentum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_momentum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tsne.html#tsne"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tsne.tsne" title="Link to this definition"></a></dt>
+<dd><p>Perform t-SNE on high-dimensional data X.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray</em><em> of </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em>) -- High-dimensional input data.</p></li>
+<li><p><strong>no_dims</strong> (<em>int</em>) -- Output dimensionality (usually 2 or 3).</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) -- Tolerance for binary search in P computation.</p></li>
+<li><p><strong>perplexity</strong> (<em>float</em>) -- Perplexity used to balance local/global aspects of the embedding.</p></li>
+<li><p><strong>ini_momentum</strong> (<em>float</em>) -- Initial momentum value used in early optimization.</p></li>
+<li><p><strong>final_momentum</strong> (<em>float</em>) -- Final momentum value used after <cite>early exaggeration</cite> phase.</p></li>
+<li><p><strong>stepsize</strong> (<em>float</em>) -- Learning rate (step size for gradient descent).</p></li>
+<li><p><strong>min_gain</strong> (<em>float</em>) -- Minimum gain applied during gradient update scaling.</p></li>
+<li><p><strong>T</strong> (<em>int</em>) -- Number of optimization iterations.</p></li>
+<li><p><strong>plot</strong> (<em>bool</em>) -- Whether to display the resulting embedding as a 2D or 3D plot.</p></li>
+<li><p><strong>save_fig</strong> (<em>bool</em>) -- Whether to save the plot as a static image or HTML.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Y</strong> -- Low-dimensional embedding of the data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray of shape (n_samples, no_dims)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- If <cite>X</cite> is not a 2D array.
+    If <cite>perplexity</cite> is greater than the number of samples.
+    If <cite>no_dims</cite> is not 2 or 3 when <cite>plot=True</cite>.
+    If <cite>stepsize</cite>, <cite>perplexity</cite>, or <cite>T</cite> are non-positive.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tsne</span> <span class="kn">import</span> <span class="n">tsne</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span> <span class="o">=</span> <span class="n">tsne</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">no_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(100, 2)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="adjustbeta-module">
+<h1>adjustbeta Module<a class="headerlink" href="#adjustbeta-module" title="Link to this heading"></a></h1>
+<p>Contents:</p>
+<dl class="py function" id="module-adjustbeta">
+<dt class="sig sig-object py" id="adjustbeta.Hbeta">
+<span class="sig-prename descclassname"><span class="pre">adjustbeta.</span></span><span class="sig-name descname"><span class="pre">Hbeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adjustbeta.html#Hbeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adjustbeta.Hbeta" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Compute entropy(H) and probability(P) from nxn distance matrix.</p>
+<dl class="simple">
+<dt>D<span class="classifier">numpy.ndarray</span></dt><dd><p>distance matrix (n,n)</p>
+</dd>
+<dt>beta<span class="classifier">float</span></dt><dd><p>precision measure</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[eta =\]</div>
+</div></blockquote>
+<p>rac{1}/{(2 * sigma^2)}</p>
+<blockquote>
+<div><dl class="simple">
+<dt>H<span class="classifier">float</span></dt><dd><p>entropy</p>
+</dd>
+<dt>P<span class="classifier">numpy.ndarray</span></dt><dd><p>probability matrix (n,n)</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="adjustbeta.adjustbeta">
+<span class="sig-prename descclassname"><span class="pre">adjustbeta.</span></span><span class="sig-name descname"><span class="pre">adjustbeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perplexity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adjustbeta.html#adjustbeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adjustbeta.adjustbeta" title="Link to this definition"></a></dt>
+<dd><p>Precision(beta) adjustment based on perplexity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em>) -- data input array with dimension (n,d)</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) -- tolerance for the stopping criteria of beta adjustment</p></li>
+<li><p><strong>perplexity</strong> (<em>float</em>) -- perplexity can be interpreted as a smooth measure of the effective number of neighbors</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>P</strong> (<em>numpy.ndarray</em>) -- probability matrix (n,n)</p></li>
+<li><p><strong>beta</strong> (<em>numpy.ndarray</em>) -- precision array (n,1)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="adjustbeta.dis_matrix">
+<span class="sig-prename descclassname"><span class="pre">adjustbeta.</span></span><span class="sig-name descname"><span class="pre">dis_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adjustbeta.html#dis_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adjustbeta.dis_matrix" title="Link to this definition"></a></dt>
+<dd><p>Compute pairwise squared Euclidean distance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>ndarray</em><em> of </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em>) -- Input data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>D</strong> -- Distance matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray of shape (n_samples, n_samples)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
 
+           </div>
           </div>
-          
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="tsne documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, yuyan liu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">tsne</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-
-<search id="searchbox" style="display: none" role="search">
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">t-SNE Module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#tsne.compute_dY"><code class="docutils literal notranslate"><span class="pre">compute_dY()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tsne.compute_p_ij"><code class="docutils literal notranslate"><span class="pre">compute_p_ij()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tsne.compute_q_ij"><code class="docutils literal notranslate"><span class="pre">compute_q_ij()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tsne.dis_matrix"><code class="docutils literal notranslate"><span class="pre">dis_matrix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tsne.pca"><code class="docutils literal notranslate"><span class="pre">pca()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tsne.tsne"><code class="docutils literal notranslate"><span class="pre">tsne()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">tsne documentation</a></li>
-  </ul></li>
-</ul>
-</div>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &#169;2025, yuyan liu.
-      
-      |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
-      
-      |
-      <a href="_sources/usage.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>
