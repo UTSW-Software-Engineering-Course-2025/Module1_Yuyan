@@ -4,6 +4,7 @@ Usage:
           [--stepsize=<float>] [--min-gain=<float>] [--iters=<int>] [--output=<output_file>] [--plot] [--save-fig]
 
 Options:
+  -h --help             Show this screen.
   --input=<input_file>       Input txt file [default: mnist2500_X.txt].
   --dims=<int>               Output dimensions [default: 2].
   --tol=<float>              Tolerance for beta search [default: 1e-5].
